@@ -6,7 +6,7 @@ import Language.Haskell.Exts(Literal(Int), Exp(App, Var, If), QName(UnQual),
         Stmt(Qualifier), Module(Module),
         Name(Ident, Symbol), Decl(FunBind, PatBind),
         Pat(PVar), Match(Match), GuardedRhs(GuardedRhs), 
-        prettyPrint, fromParseResult, parseFileContents)
+        prettyPrint, fromParseResult, parseFileContents, Pat(..))
 import Data.Generics (Data, Typeable, mkMp, listify)
 import Data.List(nub, (\\), permutations)
 import Control.Monad (liftM, zipWithM)
@@ -87,8 +87,22 @@ isFunctionD _ _                                  = False
 -- | Generate all operators for permutating pattern matches in
 -- a function. We don't deal with permutating guards and case for now.
 permMatches :: Decl -> [MuOp]
-permMatches d@(FunBind ms) = d ==>* map FunBind (permutations ms \\ [ms])
+permMatches d@(FunBind ms) = d ==>* map FunBind (swapPatterns ms \\ [ms])
 permMatches _  = []
+
+-- | Generates function pattern matches by swapping position of patterns.
+-- Excludes swaps between same constructors.
+swapPatterns lst = map (\(x:y:_) -> swapElts x y lst) $ filter filtPattern swaplst
+  where swaplst = choose [0..length lst - 1] 2
+        dCons (Match _ _ (PApp (UnQual (Ident val)) _:xs) _ _ _) = val
+        dCons (Match _ _ (PParen{}:xs) _ _ _) = ""
+        dCons (Match _ _ (PTuple{}:xs) _ _ _) = ""
+        dCons (Match _ _ (PList{}:xs) _ _ _) = ""
+        dCons (Match _ _ (PWildCard{}:xs) _ _ _) = ""
+        dCons _ = ""
+        filtPattern (x:y:_) =  dx /= dy || dx ++ dy == ""
+          where dx = dCons (lst !! x)
+                dy = dCons (lst !! y)
 
 -- | generates transformations that removes one pattern match from a function
 -- definition.
