@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Test.MuCheck.MuOp (MuOp
           , Mutable(..)
           , (==>*)
@@ -10,6 +11,7 @@ module Test.MuCheck.MuOp (MuOp
 import Language.Haskell.Exts (Name, QName, QOp, Exp, Literal, GuardedRhs, Decl)
 import qualified Data.Generics as G
 import Control.Monad (MonadPlus, mzero)
+import Data.Generics (Data, Typeable, mkMp, listify)
 
 data MuOp = N  (Name, Name)
           | QN (QName, QName)
@@ -18,7 +20,7 @@ data MuOp = N  (Name, Name)
           | D  (Decl, Decl)
           | L  (Literal, Literal)
           | G  (GuardedRhs, GuardedRhs)
-  deriving Eq
+  deriving (Eq,Typeable,Data)
 
 -- boilerplate code
 

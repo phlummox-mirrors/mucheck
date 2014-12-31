@@ -1,5 +1,12 @@
+{-# LANGUAGE RecordWildCards, DeriveDataTypeable #-}
 -- | Configuration module
 module Test.MuCheck.Config where
+
+import Text.JSON
+import Text.JSON.Types
+import Data.Typeable
+import Data.Generics (Data, Typeable, mkMp, listify)
+import Text.JSON.Generic
 
 import Test.MuCheck.MuOp
 import Test.MuCheck.Operators (allOps)
@@ -7,7 +14,7 @@ import Test.MuCheck.Operators (allOps)
 data GenerationMode
   = FirstOrderOnly
   | FirstAndHigherOrder
-  deriving (Eq, Show)
+  deriving (Eq, Show, Data, Typeable)
 
 -- | The configuration options
 -- if 1 is provided, all mutants are selected for that kind, and 0 ensures that
@@ -55,7 +62,7 @@ data Config = Config {
 -- | Generation mode, can be traditional (firstOrder) and
 -- higher order (higher order is experimental)
   , genMode :: GenerationMode }
-  deriving Show
+  deriving (Eq,Show,Data,Typeable)
 
 -- | The default configuration
 defaultConfig :: Config
@@ -66,4 +73,8 @@ defaultConfig = Config {muOps = allOps
   , doNegateGuards = 1.0
   , maxNumMutants = 300
   , genMode = FirstOrderOnly }
+
+
+jsonStatus :: String -> Config
+jsonStatus confStr = decodeJSON confStr
 
