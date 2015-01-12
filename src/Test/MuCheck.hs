@@ -15,9 +15,7 @@ import Test.MuCheck.AnalysisSummary
 -- distinguish a successful run without failures from one with failures.)
 -- E.g. using the mucheck-quickcheck adapter
 --
--- > tFn :: Mutant -> TestStr -> InterpreterOutput QuickCheckSummary`
--- > tFn = testSummary
--- > mucheck tFn "Examples/QuickCheckTest.hs" ["quickCheckResult revProp"]
+-- > mucheck (toRun "Examples/QuickCheckTest.hs" :: AssertCheckRun)
 
 mucheck :: (Show b, Summarizable b, TRun a b) =>
      a                                                     -- ^ The module we are mutating
